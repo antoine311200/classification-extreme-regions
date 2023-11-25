@@ -1,0 +1,3 @@
+# Remove pycache and eggs
+__pycache__/
+*.egg-info/
