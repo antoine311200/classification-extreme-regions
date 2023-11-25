@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: extreme-classification
+Version: 0.0.1
+Summary: Master of Research MVA project - Reimplementation of the paper 'On Binary Classification in Extreme Regions'
+Author-email: Antoine Debouchage <antoine.debouchage@student-cs.fr>, Thomas Lemercier <thomas.lemercier@student-cs.fr>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+<center><h1>Implementation : On Binary Classification in Extreme Regions</h1></center>
+<center><h4>Hamid Jalalzai, Stephan Clemenc¸on and Anne Sabourin</h4></center>

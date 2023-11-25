@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "extreme_classification"
+version = "0.0.1"
+authors = [
+  { name="Antoine Debouchage", email="antoine.debouchage@student-cs.fr" },
+  { name="Thomas Lemercier", email="thomas.lemercier@student-cs.fr" },
+]
+description = "Master of Research MVA project - Reimplementation of the paper 'On Binary Classification in Extreme Regions'"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]

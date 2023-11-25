@@ -1,0 +1,9 @@
+README.md
+pyproject.toml
+src/extreme_classification/distributions.py
+src/extreme_classification/extreme_classifier.py
+src/extreme_classification/extreme_dataset.py
+src/extreme_classification.egg-info/PKG-INFO
+src/extreme_classification.egg-info/SOURCES.txt
+src/extreme_classification.egg-info/dependency_links.txt
+src/extreme_classification.egg-info/top_level.txt
