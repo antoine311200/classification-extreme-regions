@@ -70,7 +70,7 @@ class BivariateLogisticDataset(ExtremeDataset):
 
         self.dataframe = dataframe
 
-    def get_extreme(self, k):
+    def get_extreme(self, k, as_dataset=False):
         '''
         Returns the k-th most extreme samples in the dataset according to the L1 norm.
 
@@ -82,7 +82,7 @@ class BivariateLogisticDataset(ExtremeDataset):
         dataframe = self.dataframe.copy()
         dataframe = dataframe.sort_values(by='norm', ascending=False).reset_index(drop=True)
 
-        if not isinstance(k, int):
+        if not isinstance(k, int) and not isinstance(k, np.int64) and not isinstance(k, np.int32):
             boundary = dataframe.iloc[int(k * len(dataframe)) -1]
 
             extreme_X = dataframe.iloc[:int(k * len(dataframe)) - 1].iloc[:, :-2].values
@@ -93,6 +93,10 @@ class BivariateLogisticDataset(ExtremeDataset):
             # Get the k-th most extreme samples
             extreme_X = dataframe[dataframe['norm'] >= boundary['norm']].iloc[:, :-2].values
             extreme_labels = dataframe[dataframe['norm'] >= boundary['norm']].iloc[:, -2].values
+
+        if as_dataset:
+            dataset = BivariateLogisticDataset.from_data(extreme_X, extreme_labels)
+            return dataset, boundary
 
         return extreme_X, extreme_labels, boundary
 
