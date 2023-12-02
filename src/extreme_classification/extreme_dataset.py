@@ -1,12 +1,9 @@
 import numpy as np
 import pandas as pd
 
-import torch
-from torch.utils.data import Dataset
-
 from extreme_classification.distributions import multivariate_logistic_distribution
 
-class ExtremeDataset(Dataset):
+class ExtremeDataset:
 
     def __init__(self, X, y, ranktransform=True):
         self.X = X
@@ -30,7 +27,7 @@ class ExtremeDataset(Dataset):
         self.X = V
 
     def __getitem__(self, index):
-        return torch.Tensor(self.X[index]), torch.Tensor(self.y[index])
+        return self.X[index], self.y[index]
 
     def __len__(self):
         return len(self.X)

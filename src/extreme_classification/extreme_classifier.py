@@ -4,6 +4,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import hamming_loss
 
+import numpy as np
+
 class ExtremeClassifier(BaseEstimator, ClassifierMixin):
 
     def __init__(self, model, n_classes, n_features):
@@ -20,10 +22,10 @@ class ExtremeClassifier(BaseEstimator, ClassifierMixin):
             k (int): number of extreme samples to use
         '''
         X, y, boundary = dataset.get_extreme(k)
+        X_proj = X / np.linalg.norm(X, axis=1)[:,np.newaxis]
         self.boundary = boundary
 
-        self.model.fit(X, y)
-
+        self.model.fit(X_proj, y)
 
     def predict(self, dataset, percentage=0.1):
         '''
@@ -39,6 +41,7 @@ class ExtremeClassifier(BaseEstimator, ClassifierMixin):
         extreme_dataset = dataset.make_extreme(self.boundary['norm'])
         extreme_X, y_true, _ = extreme_dataset.get_extreme(percentage)
 
+        extreme_X = extreme_X / np.linalg.norm(extreme_X, axis=1)[:,np.newaxis]
         y_pred = self.model.predict(extreme_X)
 
         return y_pred, y_true
