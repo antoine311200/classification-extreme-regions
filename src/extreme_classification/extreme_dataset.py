@@ -12,6 +12,9 @@ class ExtremeDataset:
         if ranktransform:
             self.rank_transform()
 
+        self.X_norm = np.linalg.norm(self.X, axis=1)
+        self.order = np.argsort(self.X_norm)[::-1]
+
     def rank_transform(self):
         '''
         Rank transforms the labels in the dataset.
@@ -23,7 +26,7 @@ class ExtremeDataset:
         '''
         V = np.zeros(self.X.shape)
         for i in range(self.X.shape[1]):
-            V[:, i] = 1 / (1 - np.argsort(np.argsort(self.X[:, i])) / self.X.shape[0])
+            V[:, i] = 1 / (1 - np.argsort(np.argsort(self.X[:, i])) / (self.X.shape[0]+1))
         self.X = V
 
     def __getitem__(self, index):
@@ -31,7 +34,54 @@ class ExtremeDataset:
 
     def __len__(self):
         return len(self.X)
+    
+    def get_extreme(self, k):
+        '''
+        Returns the k-th most extreme samples in the dataset according to the L1 norm.
 
+        Args:
+            k (int): number of samples to return
+        '''
+        extreme_X = self.X[self.order[:k]]
+        extreme_y = self.y[self.order[:k]]
+
+        return extreme_X, extreme_y
+    
+    def get_boundary(self, k):
+        '''
+        Returns the boundary between the k-th most extreme samples and the rest of the dataset.
+
+        Args:
+            k (int): number of samples to return
+        '''
+        return self.X_norm[self.order[k]]
+    
+    def get_standard(self, k):
+        '''
+        Returns the rest of the dataset that is not extreme.
+        
+        Args:
+            k (int): numbers of extreme samples
+        '''
+        standard_X = self.X[self.order[k:]]
+        standard_y = self.y[self.order[k:]]
+
+        return standard_X, standard_y
+    
+    def split_extreme(self, boundary):
+        '''
+        Splits the dataset into extreme and standard.
+
+        Args:
+            boundary (float): boundary between extreme and standard
+        '''
+        extreme_X = self.X[self.X_norm > boundary]
+        extreme_y = self.y[self.X_norm > boundary]
+
+        standard_X = self.X[self.X_norm <= boundary]
+        standard_y = self.y[self.X_norm <= boundary]
+
+        return extreme_X, extreme_y, standard_X, standard_y
 
 class BivariateLogisticDataset(ExtremeDataset):
 
