@@ -21,12 +21,11 @@ class ExtremeClassifier(BaseEstimator, ClassifierMixin):
             X (np.ndarray): data, shape (n_samples, n_features)
             y (np.ndarray): labels, shape (n_samples, n_classes)
         '''
-        X_norm = X / np.linalg.norm(X, axis=1)[:,np.newaxis]
-        self.boundary = np.min(np.linalg.norm(X_norm, axis=1))
-        X_proj = X / np.linalg.norm(X, axis=1)[:,np.newaxis]
+        self.boundary = np.min(np.linalg.norm(X, axis=1, ord=1))
+        X_proj = X / np.linalg.norm(X, axis=1, ord=1)[:,np.newaxis]
         self.model.fit(X_proj, y)
 
-    def predict(self, X):
+    def predict(self, X, y=None):
         '''
         Predicts the labels for the data.
 
@@ -36,14 +35,20 @@ class ExtremeClassifier(BaseEstimator, ClassifierMixin):
         Returns:
             labels (np.ndarray): predicted labels, shape (n_samples, n_classes)
         '''
-        X_norm = np.linalg.norm(X, axis=1)
+        X_norm = np.linalg.norm(X, axis=1, ord=1)
         X_valid = X_norm >= self.boundary
-        
+
         if not np.all(X_valid):
             print("Warning: some samples are not extreme enough.")
 
         extreme_X = X / X_norm[:,np.newaxis]
         y_pred = self.model.predict(extreme_X)
+
+        if y is not None:
+            accuracy = accuracy_score(y, y_pred)
+            hamming_loss = hamming_loss(y, y_pred)
+
+            return y_pred, accuracy, hamming_loss
 
         return y_pred
 
