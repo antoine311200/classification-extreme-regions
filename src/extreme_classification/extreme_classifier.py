@@ -13,63 +13,71 @@ class ExtremeClassifier(BaseEstimator, ClassifierMixin):
         self.n_classes = n_classes
         self.n_features = n_features
 
-    def fit(self, dataset, k=100):
+    def fit(self, X, y):
         '''
         Fits the model to the data.
 
         Args:
-            dataset (ExtremeDataset): dataset
-            k (int): number of extreme samples to use
+            X (np.ndarray): data, shape (n_samples, n_features)
+            y (np.ndarray): labels, shape (n_samples, n_classes)
         '''
-        X, y, boundary = dataset.get_extreme(k)
-        X_proj = X / np.linalg.norm(X, axis=1)[:,np.newaxis]
-        self.boundary = boundary
-
+        self.boundary = np.min(np.linalg.norm(X, axis=1, ord=1))
+        X_proj = X / np.linalg.norm(X, axis=1, ord=1)[:,np.newaxis]
         self.model.fit(X_proj, y)
 
-    def predict(self, dataset, percentage=0.1):
+    def predict(self, X, y=None):
         '''
         Predicts the labels for the data.
 
         Args:
-            dataset (ExtremeDataset): dataset
+            X (np.ndarray): data, shape (n_samples, n_features)
 
         Returns:
-            labels (np.ndarray): predicted labels
+            labels (np.ndarray): predicted labels, shape (n_samples, n_classes)
         '''
+        X_norm = np.linalg.norm(X, axis=1, ord=1)
+        X_valid = X_norm >= self.boundary
 
-        extreme_dataset = dataset.make_extreme(self.boundary['norm'])
-        extreme_X, y_true, _ = extreme_dataset.get_extreme(percentage)
+        if not np.all(X_valid):
+            print("Warning: some samples are not extreme enough.")
 
-        extreme_X = extreme_X / np.linalg.norm(extreme_X, axis=1)[:,np.newaxis]
+        extreme_X = X / X_norm[:,np.newaxis]
         y_pred = self.model.predict(extreme_X)
 
-        return y_pred, y_true
+        if y is not None:
+            accuracy = accuracy_score(y, y_pred)
+            hamming_loss = hamming_loss(y, y_pred)
 
-    def score(self, dataset, percentage=0.1):
+            return y_pred, accuracy, hamming_loss
+
+        return y_pred
+
+    def score(self, X, y):
         '''
         Returns the score of the model.
 
         Args:
-            dataset (ExtremeDataset): dataset
+            X (np.ndarray): data, shape (n_samples, n_features)
+            y (np.ndarray): labels, shape (n_samples, n_classes)
 
         Returns:
             score (float): score
         '''
-        y_pred, y_true = self.predict(dataset, percentage)
-        score = accuracy_score(y_true, y_pred > 0.5)
+        y_pred = self.predict(X)
+        score = accuracy_score(y, y_pred)
         return score
 
-    def hamming_loss(self, dataset, percentage=0.1):
+    def hamming_loss(self, X, y):
         '''
         Returns the hamming loss of the model.
 
         Args:
-            dataset (ExtremeDataset): dataset
+            X (np.ndarray): data, shape (n_samples, n_features)
+            y (np.ndarray): labels, shape (n_samples, n_classes)
 
         Returns:
             score (float): hamming loss
         '''
-        y_pred, y_true = self.predict(dataset, percentage)
-        score = hamming_loss(y_true, y_pred > 0.5)
+        y_pred = self.predict(X)
+        score = hamming_loss(y, y_pred)
         return score
